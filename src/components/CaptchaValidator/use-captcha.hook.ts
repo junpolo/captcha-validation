@@ -1,6 +1,6 @@
 import React from "react";
 
-import { CaptchaSection, WatermarkTypes } from "./captcha.types";
+import { CaptchaSection, WatermarkTypes, CaptchaConfig } from "./captcha.types";
 import {
   MAX_ATTEMPT_TOLERANCE,
   SECTION_LENGTH,
@@ -8,22 +8,19 @@ import {
 } from "./captcha.constants";
 
 export const useCaptcha = () => {
-  // Captcha data states
-  const [isCaptchaValid, setIsCaptchaValid] = React.useState(false);
-  const [captchaData, setCaptchaData] = React.useState<CaptchaSection>({});
-  const [watermarkReference, setWatermarkReference] =
-    React.useState<WatermarkTypes | null>(null);
+  // Captcha state
+  const [captchaConfig, setCaptchaConfig] =
+    React.useState<CaptchaConfig | null>(null);
 
   // User selection and attempt states
   const [selectedSections, setSelectedSections] = React.useState<number[]>([]);
   const [attemptCount, setAttemptCount] = React.useState(MAX_ATTEMPT_TOLERANCE);
 
   // Generate captcha configurations
-  const randomizeWatermarkReference = React.useCallback(() => {
-    setWatermarkReference(
-      WATERMARKS[Math.floor(Math.random() * WATERMARKS.length)]
-    );
-  }, [setWatermarkReference]);
+  const randomizeWatermarkReference = React.useCallback(
+    () => WATERMARKS[Math.floor(Math.random() * WATERMARKS.length)],
+    []
+  );
 
   const generateWatermarks = React.useCallback(() => {
     const captcha: CaptchaSection = {};
@@ -48,7 +45,7 @@ export const useCaptcha = () => {
 
   const getShapeForSection = (index: number) => {
     const key = index.toString();
-    return captchaData[key] || null;
+    return captchaConfig?.captchaData[key] || null;
   };
 
   const getImageSrc = (shape: WatermarkTypes | null) => {
@@ -65,11 +62,13 @@ export const useCaptcha = () => {
   };
 
   const generateCaptchaConfig = (resetAttemptCount = false) => {
-    setIsCaptchaValid(false);
-    randomizeWatermarkReference();
-    setSelectedSections([]);
-    setCaptchaData(generateWatermarks());
+    setCaptchaConfig({
+      isCaptchaValid: false,
+      captchaData: generateWatermarks(),
+      watermarkReference: randomizeWatermarkReference(),
+    });
 
+    setSelectedSections([]);
     if (resetAttemptCount) setAttemptCount(MAX_ATTEMPT_TOLERANCE);
   };
 
@@ -89,12 +88,18 @@ export const useCaptcha = () => {
     selectedSections.includes(index) ? "bg-blue-500" : "bg-gray-500/25";
 
   // Handle captcha validations
-
   const handleValidateButton = () => {
     const isValid = validateCaptcha();
 
     if (isValid) {
-      setIsCaptchaValid(true);
+      // setIsCaptchaValid(true);
+      setCaptchaConfig((prevConfig) => {
+        return {
+          ...prevConfig,
+          isCaptchaValid: true,
+        } as CaptchaConfig;
+      });
+
       setAttemptCount(MAX_ATTEMPT_TOLERANCE);
     } else {
       generateCaptchaConfig();
@@ -103,10 +108,11 @@ export const useCaptcha = () => {
   };
 
   const validateCaptcha = React.useCallback(() => {
-    if (!watermarkReference) {
-      console.warn("There is no watermark reference.");
+    if (!captchaConfig) {
+      console.warn("There is no captcha configuration initialized");
       return false;
     }
+    const { captchaData, watermarkReference } = captchaConfig;
 
     // Get all correct indexes based on the watermarkReference
     const correctIndexes: number[] = [];
@@ -137,7 +143,7 @@ export const useCaptcha = () => {
     }
 
     return isValid;
-  }, [captchaData, selectedSections, watermarkReference]);
+  }, [captchaConfig, selectedSections]);
 
   // TODO: Remove after button init
   React.useEffect(() => {
@@ -146,16 +152,14 @@ export const useCaptcha = () => {
 
   return {
     SECTION_LENGTH,
-    captchaData,
+    captchaConfig,
     getShapeForSection,
     getImageSrc,
-    watermarkReference,
     handleSectionClick,
     selectedSections,
     getSectionBackgroundColor,
     handleValidateButton,
     attemptCount,
     generateCaptchaConfig,
-    isCaptchaValid,
   };
 };

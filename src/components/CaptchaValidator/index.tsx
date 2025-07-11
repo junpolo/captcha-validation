@@ -9,16 +9,15 @@ import { MAX_ATTEMPT_TOLERANCE } from "./captcha.constants";
 export const CaptchaValidator = () => {
   const {
     SECTION_LENGTH,
+    captchaConfig,
     getShapeForSection,
     getImageSrc,
-    watermarkReference,
     handleSectionClick,
     selectedSections,
     getSectionBackgroundColor,
     handleValidateButton,
     attemptCount,
     generateCaptchaConfig,
-    isCaptchaValid,
   } = useCaptcha();
 
   const canValidate = React.useMemo(() => attemptCount > 0, [attemptCount]);
@@ -27,7 +26,9 @@ export const CaptchaValidator = () => {
     [attemptCount]
   );
 
-  if (isCaptchaValid) {
+  // return <EntryComponent onContinue={() => generateCaptchaConfig(true)} />;
+
+  if (captchaConfig?.isCaptchaValid) {
     return (
       <div className="flex flex-col gap-8">
         <h1 className="text-center text-4xl font-semibold capitalize">
@@ -48,7 +49,7 @@ export const CaptchaValidator = () => {
       {canValidate && (
         <>
           <h1 className="text-center text-4xl font-semibold capitalize">
-            Select {watermarkReference + "s"}
+            Select {captchaConfig?.watermarkReference + "s"}
           </h1>
 
           {onError && (

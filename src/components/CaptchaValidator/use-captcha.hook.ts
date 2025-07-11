@@ -1,29 +1,34 @@
 import React from "react";
 
-type WatermarkTypes = "circle" | "square" | "triangle";
-
-type CaptchaSection = {
-  [key: string]: WatermarkTypes;
-};
-
-const SECTION_LENGTH = 25;
-const MAX_ATTEMPT_TOLERANCE = 5;
-const watermarks: WatermarkTypes[] = ["circle", "square", "triangle"];
+import { CaptchaSection, WatermarkTypes } from "./captcha.types";
+import {
+  MAX_ATTEMPT_TOLERANCE,
+  SECTION_LENGTH,
+  WATERMARKS,
+} from "./captcha.constants";
 
 export const useCaptcha = () => {
+  // Captcha data states
+  const [isCaptchaValid, setIsCaptchaValid] = React.useState(false);
   const [captchaData, setCaptchaData] = React.useState<CaptchaSection>({});
   const [watermarkReference, setWatermarkReference] =
-    React.useState<WatermarkTypes | null>("square");
+    React.useState<WatermarkTypes | null>(null);
 
+  // User selection and attempt states
   const [selectedSections, setSelectedSections] = React.useState<number[]>([]);
-
   const [attemptCount, setAttemptCount] = React.useState(MAX_ATTEMPT_TOLERANCE);
 
-  // Generate watermarks
+  // Generate captcha configurations
+  const randomizeWatermarkReference = React.useCallback(() => {
+    setWatermarkReference(
+      WATERMARKS[Math.floor(Math.random() * WATERMARKS.length)]
+    );
+  }, [setWatermarkReference]);
+
   const generateWatermarks = React.useCallback(() => {
     const captcha: CaptchaSection = {};
 
-    watermarks.forEach((watermark) => {
+    WATERMARKS.forEach((watermark) => {
       let count = 0;
 
       while (count < 4) {
@@ -45,6 +50,7 @@ export const useCaptcha = () => {
     const key = index.toString();
     return captchaData[key] || null;
   };
+
   const getImageSrc = (shape: WatermarkTypes | null) => {
     switch (shape) {
       case "circle":
@@ -56,6 +62,15 @@ export const useCaptcha = () => {
       default:
         return null;
     }
+  };
+
+  const generateCaptchaConfig = (resetAttemptCount = false) => {
+    setIsCaptchaValid(false);
+    randomizeWatermarkReference();
+    setSelectedSections([]);
+    setCaptchaData(generateWatermarks());
+
+    if (resetAttemptCount) setAttemptCount(MAX_ATTEMPT_TOLERANCE);
   };
 
   // Handle section actions
@@ -74,12 +89,15 @@ export const useCaptcha = () => {
     selectedSections.includes(index) ? "bg-blue-500" : "bg-gray-500/25";
 
   // Handle captcha validations
+
   const handleValidateButton = () => {
     const isValid = validateCaptcha();
 
     if (isValid) {
+      setIsCaptchaValid(true);
       setAttemptCount(MAX_ATTEMPT_TOLERANCE);
     } else {
+      generateCaptchaConfig();
       setAttemptCount((prevCount) => prevCount - 1);
     }
   };
@@ -123,8 +141,8 @@ export const useCaptcha = () => {
 
   // TODO: Remove after button init
   React.useEffect(() => {
-    setCaptchaData(generateWatermarks());
-  }, [generateWatermarks]);
+    generateCaptchaConfig(true);
+  }, []);
 
   return {
     SECTION_LENGTH,
@@ -137,5 +155,7 @@ export const useCaptcha = () => {
     getSectionBackgroundColor,
     handleValidateButton,
     attemptCount,
+    generateCaptchaConfig,
+    isCaptchaValid,
   };
 };

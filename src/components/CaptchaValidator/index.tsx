@@ -2,9 +2,9 @@ import React from "react";
 import Image from "next/image";
 
 import { Button } from "@components";
-import { EntryComponent } from "./entry.component";
 import { useCaptcha } from "./use-captcha.hook";
 import { MAX_ATTEMPT_TOLERANCE } from "./captcha.constants";
+import { EntryComponent, SuccessComponent } from "./components/";
 
 export const CaptchaValidator = () => {
   const {
@@ -26,22 +26,12 @@ export const CaptchaValidator = () => {
     [attemptCount]
   );
 
-  // return <EntryComponent onContinue={() => generateCaptchaConfig(true)} />;
+  if (!captchaConfig) {
+    return <EntryComponent onContinue={() => generateCaptchaConfig(true)} />;
+  }
 
-  if (captchaConfig?.isCaptchaValid) {
-    return (
-      <div className="flex flex-col gap-8">
-        <h1 className="text-center text-4xl font-semibold capitalize">
-          Well done!
-        </h1>
-
-        <p className="text-center text-2xl font-semibold">
-          You have proven your humanity.
-        </p>
-
-        <Button onClick={() => generateCaptchaConfig(true)}>reCAPTCHA</Button>
-      </div>
-    );
+  if (captchaConfig.isCaptchaValid) {
+    return <SuccessComponent onRecaptcha={() => generateCaptchaConfig(true)} />;
   }
 
   return (
@@ -49,7 +39,7 @@ export const CaptchaValidator = () => {
       {canValidate && (
         <>
           <h1 className="text-center text-4xl font-semibold capitalize">
-            Select {captchaConfig?.watermarkReference + "s"}
+            Select {captchaConfig.watermarkReference + "s"}
           </h1>
 
           {onError && (

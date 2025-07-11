@@ -145,11 +145,6 @@ export const useCaptcha = () => {
     return isValid;
   }, [captchaConfig, selectedSections]);
 
-  // TODO: Remove after button init
-  React.useEffect(() => {
-    generateCaptchaConfig(true);
-  }, []);
-
   return {
     SECTION_LENGTH,
     captchaConfig,

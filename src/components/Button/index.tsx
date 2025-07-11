@@ -17,7 +17,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
-      className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer ${className}`}
+      className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-6 px-4 rounded cursor-pointer text-xl ${className}`}
       onClick={handleClick}
     >
       {children}

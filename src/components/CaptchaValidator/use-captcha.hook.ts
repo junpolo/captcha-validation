@@ -29,9 +29,7 @@ export const useCaptcha = () => {
       let count = 0;
 
       while (count < 4) {
-        const randomKey = Math.floor(
-          Math.random() * (SECTION_LENGTH + 1)
-        ).toString();
+        const randomKey = Math.floor(Math.random() * SECTION_LENGTH).toString();
 
         if (!captcha.hasOwnProperty(randomKey)) {
           captcha[randomKey] = watermark;

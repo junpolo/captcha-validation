@@ -149,7 +149,6 @@ export const useCaptcha = () => {
     getShapeForSection,
     getImageSrc,
     handleSectionClick,
-    selectedSections,
     getSectionBackgroundColor,
     handleValidateButton,
     attemptCount,

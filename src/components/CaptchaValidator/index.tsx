@@ -13,7 +13,6 @@ export const CaptchaValidator = () => {
     getShapeForSection,
     getImageSrc,
     handleSectionClick,
-    selectedSections,
     getSectionBackgroundColor,
     handleValidateButton,
     attemptCount,

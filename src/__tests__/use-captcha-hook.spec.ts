@@ -5,13 +5,8 @@ import {
   WATERMARKS,
   MAX_ATTEMPT_TOLERANCE,
   SECTION_LENGTH,
-  MINIMUM_SECTION_LENGTH,
 } from "../components/CaptchaValidator/captcha.constants";
-import {
-  WatermarkTypes,
-  CaptchaSection,
-  CaptchaConfig,
-} from "../components/CaptchaValidator/captcha.types";
+import { WatermarkTypes } from "../components/CaptchaValidator/captcha.types";
 
 describe("useCaptcha hook", () => {
   beforeEach(() => {

@@ -19,22 +19,28 @@ export const CaptchaValidator = () => {
     generateCaptchaConfig,
   } = useCaptcha();
 
+  // Ensures that the user can only validate when there are attempts left
   const canValidate = React.useMemo(() => attemptCount > 0, [attemptCount]);
+
+  // Display error when attempt count is less than MAX_ATTEMPT_TOLERANCE
   const onError = React.useMemo(
     () => attemptCount < MAX_ATTEMPT_TOLERANCE,
     [attemptCount]
   );
 
+  // Render entry component if there is no captchaConfig
   if (!captchaConfig) {
     return <EntryComponent onContinue={() => generateCaptchaConfig(true)} />;
   }
 
+  // Render success component if the captcha is valid
   if (captchaConfig.isCaptchaValid) {
     return <SuccessComponent onRecaptcha={() => generateCaptchaConfig(true)} />;
   }
 
   return (
     <div className="flex flex-col gap-8">
+      {/* Display captcha header during validation */}
       {canValidate && (
         <>
           <h1 className="text-center text-4xl font-semibold capitalize">
@@ -49,6 +55,7 @@ export const CaptchaValidator = () => {
         </>
       )}
 
+      {/* Display captcha */}
       {canValidate ? (
         <div className="grid grid-rows-5 grid-cols-5">
           {Array.from({ length: SECTION_LENGTH }, (_, index) => {
@@ -76,6 +83,7 @@ export const CaptchaValidator = () => {
           })}
         </div>
       ) : (
+        // Display error picture if captcha fails
         <Image
           src="/recaptcha-meme.png"
           width={600}
@@ -85,6 +93,7 @@ export const CaptchaValidator = () => {
       )}
 
       <div className="flex flex-col gap-3 justify-center">
+        {/* Display validation attempts and button if user can still attempt to validate the captcha */}
         {canValidate ? (
           <>
             <p className="text-center">
@@ -93,6 +102,7 @@ export const CaptchaValidator = () => {
             <Button onClick={handleValidateButton}>Validate</Button>
           </>
         ) : (
+          // Display error message if user has reached the maximum validation attempts
           <>
             <p className="text-center">
               You have reached the maximum validation attempts!

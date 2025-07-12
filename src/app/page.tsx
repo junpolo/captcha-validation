@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-import { Button, CaptchaValidator } from "@components";
+import { CaptchaValidator } from "@components";
 
 export default function HomePage() {
   return (

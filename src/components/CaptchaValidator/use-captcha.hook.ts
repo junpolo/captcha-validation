@@ -5,6 +5,7 @@ import {
   MAX_ATTEMPT_TOLERANCE,
   SECTION_LENGTH,
   WATERMARKS,
+  ENTITY_PER_WATERMARK,
 } from "./captcha.constants";
 
 export const useCaptcha = () => {
@@ -26,9 +27,7 @@ export const useCaptcha = () => {
     const captcha: CaptchaSection = {};
 
     WATERMARKS.forEach((watermark) => {
-      let count = 0;
-
-      while (count < 4) {
+      for (let count = 0; count < ENTITY_PER_WATERMARK; ) {
         const randomKey = Math.floor(Math.random() * SECTION_LENGTH).toString();
 
         if (!captcha.hasOwnProperty(randomKey)) {
@@ -90,7 +89,6 @@ export const useCaptcha = () => {
     const isValid = validateCaptcha();
 
     if (isValid) {
-      // setIsCaptchaValid(true);
       setCaptchaConfig((prevConfig) => {
         return {
           ...prevConfig,
@@ -153,5 +151,11 @@ export const useCaptcha = () => {
     handleValidateButton,
     attemptCount,
     generateCaptchaConfig,
+    selectedSections,
+    generateWatermarks,
+    setSelectedSections,
+    setAttemptCount,
+    randomizeWatermarkReference,
+    setCaptchaConfig,
   };
 };
